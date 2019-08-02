@@ -20,8 +20,8 @@
 
 #include <algorithm>
 #include <utility>
-#include <secp256k1.h>
-#include <secp256k1_recovery.h>
+#include <secp256k1/secp256k1.h>
+#include <secp256k1/secp256k1_recovery.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <bitcoin/system/math/hash.hpp>
 #include <bitcoin/system/math/limits.hpp>

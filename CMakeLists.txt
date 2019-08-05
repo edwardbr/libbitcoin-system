@@ -585,8 +585,8 @@ install(
 )
 
 install(
-    DIRECTORY include
-    DESTINATION "${include_install_dir}/${PROJECT_NAME}"
+    DIRECTORY include/
+    DESTINATION "${include_install_dir}"
 )
 
 install(

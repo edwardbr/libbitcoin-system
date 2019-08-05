@@ -584,10 +584,8 @@ install(
     INCLUDES DESTINATION "${include_install_dir}"
 )
 
-file(GLOB_RECURSE headers include/*.h*)
-
 install(
-    FILES ${headers} 
+    DIRECTORY include
     DESTINATION "${include_install_dir}/${PROJECT_NAME}"
 )
 

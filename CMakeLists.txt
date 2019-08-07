@@ -37,30 +37,13 @@ option( with-examples  "Compile with examples." "yes")
 #------------------------------------------------------------------------------
 option( with-icu "Compile with International Components for Unicode." "no" )
 
-if (with-icu)
-    add_definitions( -DBOOST_HAS_ICU )
-endif()
-
-if (with-icu)
-    set( icu "-DWITH_ICU" )
-endif()
-
 # Implement -Dwith-png and output ${png}.
 #------------------------------------------------------------------------------
 option( with-png "Compile with Libpng support." "no")
 
-if (with-png)
-    set( png "-DWITH_PNG" )
-endif()
-
 # Implement -Dwith-qrencode and output ${qrencode}.
 #------------------------------------------------------------------------------
 option( with-qrencode "Compile with QREncode." "no" )
-
-if (with-qrencode)
-    set( qrencode "-DWITH_QRENCODE" )
-endif()
-
 
 # Find secp256k1
 #------------------------------------------------------------------------------
@@ -71,12 +54,12 @@ find_package(secp256k1 CONFIG REQUIRED)
 # Find boost
 #------------------------------------------------------------------------------
 
-hunter_add_package(Boost COMPONENTS atomic
+hunter_add_package(Boost COMPONENTS 
+    atomic
     chrono
     date_time
     filesystem
     iostreams
-    locale
     log
     program_options
     regex
@@ -90,7 +73,6 @@ find_package(Boost CONFIG REQUIRED
     date_time
     filesystem
     iostreams
-    locale
     log_setup
     log
     program_options
@@ -98,33 +80,32 @@ find_package(Boost CONFIG REQUIRED
     system
     thread
     unit_test_framework)
-# Find rt
-#------------------------------------------------------------------------------
-#if ((${CMAKE_SYSTEM_NAME} MATCHES "Linux") AND NOT ANDROID)
-#    find_package( Rt REQUIRED )
-#endif()
 
 # Find icu-i18n
 #------------------------------------------------------------------------------
 if (with-icu)
-    find_package( Icu-I18N 51.2 REQUIRED )
-endif()
+    hunter_add_package(ICU)
+    find_package(ICU CONFIG REQUIRED)
+    
+    hunter_add_package(Boost COMPONENTS locale)
+    find_package(Boost CONFIG REQUIRED locale)
 
-# Find dl
-#------------------------------------------------------------------------------
-#if ((${CMAKE_SYSTEM_NAME} MATCHES "Linux"))
-#    find_package( Dl REQUIRED )
-#endif()
+    add_definitions( -DBOOST_HAS_ICU )
+    set( icu "-DWITH_ICU" )
+endif()
 
 # Find png
 #------------------------------------------------------------------------------
 if (with-png)
-    find_package( Png 1.6.29 REQUIRED )
+    set( png "-DWITH_PNG" )
+    hunter_add_package(PNG)
+    find_package(PNG CONFIG REQUIRED)
 endif()
 
 # Find qrencode
 #------------------------------------------------------------------------------
 if (with-qrencode)
+    set( qrencode "-DWITH_QRENCODE" )
     find_package( Qrencode 3.4.4 REQUIRED )
 endif()
 
@@ -371,7 +352,6 @@ target_link_libraries( ${PROJECT_NAME}
                             Boost::date_time
                             Boost::filesystem
                             Boost::iostreams
-                            Boost::locale
                             Boost::log_setup
                             Boost::log
                             Boost::program_options
@@ -381,7 +361,10 @@ target_link_libraries( ${PROJECT_NAME}
                             Threads::Threads
                             secp256k1::secp256k1)
 
-                            
+if (with-icu)
+    target_link_libraries( ${PROJECT_NAME} Boost::locale ICU::uc)
+endif ()
+
 # Define libbitcoin-system-examples project.
 #------------------------------------------------------------------------------
 if (with-examples)

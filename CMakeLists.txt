@@ -87,9 +87,6 @@ if (with-icu)
     hunter_add_package(ICU)
     find_package(ICU CONFIG REQUIRED)
     
-    hunter_add_package(Boost COMPONENTS locale)
-    find_package(Boost CONFIG REQUIRED locale)
-
     add_definitions( -DBOOST_HAS_ICU )
     set( icu "-DWITH_ICU" )
 endif()
@@ -362,7 +359,7 @@ target_link_libraries( ${PROJECT_NAME}
                             secp256k1::secp256k1)
 
 if (with-icu)
-    target_link_libraries( ${PROJECT_NAME} Boost::locale ICU::uc)
+    target_link_libraries( ${PROJECT_NAME} ICU::uc)
 endif ()
 
 # Define libbitcoin-system-examples project.

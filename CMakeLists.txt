@@ -1,6 +1,6 @@
 # Copyright (c) 2017 The Bitcoin developers
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.13)
 
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -27,7 +27,7 @@ include(CTest)
 
 # Implement -Dwith-tests and declare with-tests.
 #------------------------------------------------------------------------------
-option(with-tests "Compile with unit tests" yes)
+option(with-tests "Compile with unit tests" "yes")
 
 # Implement -Dwith-examples and declare with-examples.
 #------------------------------------------------------------------------------
@@ -84,11 +84,15 @@ find_package(Boost CONFIG REQUIRED
 # Find icu-i18n
 #------------------------------------------------------------------------------
 if (with-icu)
+    message(STATUS "compiling with ICU")
     hunter_add_package(ICU)
     find_package(ICU CONFIG REQUIRED)
     
     add_definitions( -DBOOST_HAS_ICU )
-    set( icu "-DWITH_ICU" )
+    add_definitions( -DWITH_ICU )
+
+    hunter_add_package(Boost COMPONENTS locale)
+    find_package(Boost CONFIG REQUIRED locale)
 endif()
 
 # Find png
@@ -359,7 +363,11 @@ target_link_libraries( ${PROJECT_NAME}
                             secp256k1::secp256k1)
 
 if (with-icu)
-    target_link_libraries( ${PROJECT_NAME} ICU::uc)
+    target_link_libraries( ${PROJECT_NAME} 
+        ICU::uc
+        ICU::i18n
+        ICU::data
+        Boost::locale)
 endif ()
 
 # Define libbitcoin-system-examples project.
@@ -377,8 +385,15 @@ if (with-examples)
     #------------------------------------------------------------------------------
     target_link_libraries( ${PROJECT_NAME}-examples
         ${PROJECT_NAME} 
-                            secp256k1::secp256k1)
-
+        secp256k1::secp256k1)
+        
+    if (with-icu)
+        target_link_libraries( ${PROJECT_NAME}-examples
+            ICU::uc
+            ICU::i18n
+            ICU::data
+            Boost::locale)
+    endif ()
 endif()
 
 # Define libbitcoin-system-test project.
@@ -515,6 +530,13 @@ if (with-tests)
         ${PROJECT_NAME}
         Boost::unit_test_framework )
 
+    if (with-icu)
+        target_link_libraries( ${PROJECT_NAME}-test
+            ICU::uc
+            ICU::i18n
+            ICU::data
+            Boost::locale)
+    endif ()
 endif()
 
 

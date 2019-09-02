@@ -27,11 +27,11 @@ include(CTest)
 
 # Implement -Dwith-tests and declare with-tests.
 #------------------------------------------------------------------------------
-option(with-tests "Compile with unit tests" "yes")
+option(with-tests "Compile with unit tests" "no")
 
 # Implement -Dwith-examples and declare with-examples.
 #------------------------------------------------------------------------------
-option( with-examples  "Compile with examples." "yes")
+option( with-examples  "Compile with examples." "no")
 
 # Implement -Dwith-icu and define BOOST_HAS_ICU and output ${icu}.
 #------------------------------------------------------------------------------

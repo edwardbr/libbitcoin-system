@@ -308,32 +308,33 @@ add_library( ${PROJECT_NAME}
     "src/wallet/parse_encrypted_keys/parse_encrypted_token.hpp" )
 
 
+if(NOT WIN32)
+    # libsecp256k1 use a different set of flags.
+    target_compile_options(${PROJECT_NAME} PRIVATE
+         "-Wall" 
 
-# libsecp256k1 use a different set of flags.
-target_compile_options(${PROJECT_NAME} PRIVATE
-     "-Wall" 
+        # Warn on extra stuff.
+        "-Wextra" 
 
-    # Warn on extra stuff.
-    "-Wextra" 
+        # Be really annoying.
+        "-Wpedantic" 
 
-    # Be really annoying.
-    "-Wpedantic" 
+        # Disallow warning on style order of declarations.
+        "-Wno-reorder" 
 
-    # Disallow warning on style order of declarations.
-    "-Wno-reorder" 
+        # Suppress warning for incomplete field initialization.
+        "-Wno-missing-field-initializers" 
 
-    # Suppress warning for incomplete field initialization.
-    "-Wno-missing-field-initializers" 
+        # Conform to style.
+        "-Wno-missing-braces" 
 
-    # Conform to style.
-    "-Wno-missing-braces" 
+        # Ignore comments within comments or commenting of backslash extended lines.
+        "-Wno-comment" 
 
-    # Ignore comments within comments or commenting of backslash extended lines.
-    "-Wno-comment" 
-
-    # Allow use of C99 'long long' type.
-    "-Wno-long-long"
-)
+        # Allow use of C99 'long long' type.
+        "-Wno-long-long"
+    )
+endif()
 
 
 # Conflict in stdlib under clang.

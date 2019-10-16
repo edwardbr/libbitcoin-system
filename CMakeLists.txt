@@ -45,6 +45,10 @@ option( with-png "Compile with Libpng support." "no")
 #------------------------------------------------------------------------------
 option( with-qrencode "Compile with QREncode." "no" )
 
+# select a particular windows version for optimal performance 0x0A00 is windows 10
+#------------------------------------------------------------------------------
+set( windows-version "0x0A00" )
+
 # Find secp256k1
 #------------------------------------------------------------------------------
 
@@ -61,6 +65,7 @@ hunter_add_package(Boost COMPONENTS
     filesystem
     iostreams
     log
+	locale
     program_options
     regex
     system
@@ -75,6 +80,7 @@ find_package(Boost CONFIG REQUIRED
     iostreams
     log_setup
     log
+	locale
     program_options
     regex
     system
@@ -90,9 +96,6 @@ if (with-icu)
     
     add_definitions( -DBOOST_HAS_ICU )
     add_definitions( -DWITH_ICU )
-
-    hunter_add_package(Boost COMPONENTS locale)
-    find_package(Boost CONFIG REQUIRED locale)
 endif()
 
 # Find png
@@ -308,7 +311,12 @@ add_library( ${PROJECT_NAME}
     "src/wallet/parse_encrypted_keys/parse_encrypted_token.hpp" )
 
 
-if(NOT WIN32)
+if(WIN32)
+	target_compile_options(${PROJECT_NAME} PRIVATE 
+		"-DBC_STATIC" 
+		"-DNOMINMAX" 
+		"-D_WIN32_WINNT=${windows-version}")
+else(WIN32)
     # libsecp256k1 use a different set of flags.
     target_compile_options(${PROJECT_NAME} PRIVATE
          "-Wall" 
@@ -377,7 +385,14 @@ if (with-examples)
     add_executable( ${PROJECT_NAME}-examples
         "examples/main.cpp" )
 
-    #     libbitcoin-system-examples project specific include directories.
+	if(WIN32)
+		target_compile_options(${PROJECT_NAME}-examples PRIVATE 
+			"-DBC_STATIC" 
+			"-DNOMINMAX" 
+			"-D_WIN32_WINNT=${windows-version}")
+	endif(WIN32)
+
+#     libbitcoin-system-examples project specific include directories.
     #------------------------------------------------------------------------------
     target_include_directories( ${PROJECT_NAME}-examples PRIVATE
         "include" )
@@ -386,14 +401,14 @@ if (with-examples)
     #------------------------------------------------------------------------------
     target_link_libraries( ${PROJECT_NAME}-examples
         ${PROJECT_NAME} 
-        secp256k1::secp256k1)
+        secp256k1::secp256k1
+            Boost::locale)
         
     if (with-icu)
         target_link_libraries( ${PROJECT_NAME}-examples
             ICU::uc
             ICU::i18n
-            ICU::data
-            Boost::locale)
+            ICU::data)
     endif ()
 endif()
 
@@ -512,6 +527,13 @@ if (with-tests)
         "test/wallet/stealth_sender.cpp"
         "test/wallet/uri.cpp"
         "test/wallet/uri_reader.cpp" )
+
+	if(WIN32)
+		target_compile_options(${PROJECT_NAME}-test PRIVATE 
+			"-DBC_STATIC" 
+			"-DNOMINMAX" 
+			"-D_WIN32_WINNT=${windows-version}")
+	endif(WIN32)
 
     add_test( NAME ${PROJECT_NAME}-test COMMAND ${PROJECT_NAME}-test
             --run_test=*

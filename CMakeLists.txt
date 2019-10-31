@@ -14,9 +14,10 @@ include(HunterGate)
 message(STATUS "[project] CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
 option(HUNTER_STATUS_DEBUG "Hunter debug info" ON)
+
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.23.165.tar.gz"
-    SHA1 "5a73f91df5f6109c0bb1104d0c0ee423f7bece79"
+    URL "https://github.com/ruslo/hunter/archive/v0.23.214.tar.gz"
+    SHA1 "e14bc153a7f16d6a5eeec845fb0283c8fad8c358"
     LOCAL
 )
 
@@ -67,7 +68,6 @@ hunter_add_package(Boost COMPONENTS
     filesystem
     iostreams
     log
-	locale
     program_options
     regex
     system
@@ -82,7 +82,6 @@ find_package(Boost CONFIG REQUIRED
     iostreams
     log_setup
     log
-	locale
     program_options
     regex
     system
@@ -98,6 +97,11 @@ if (with-icu)
     
     add_definitions( -DBOOST_HAS_ICU )
     add_definitions( -DWITH_ICU )
+
+
+    hunter_add_package(Boost COMPONENTS locale)
+    find_package(Boost CONFIG REQUIRED locale)
+
 endif()
 
 # Find png
@@ -403,14 +407,14 @@ if (with-examples)
     #------------------------------------------------------------------------------
     target_link_libraries( ${PROJECT_NAME}-examples
         ${PROJECT_NAME} 
-        secp256k1::secp256k1
-            Boost::locale)
+        secp256k1::secp256k1)
         
     if (with-icu)
         target_link_libraries( ${PROJECT_NAME}-examples
             ICU::uc
             ICU::i18n
-            ICU::data)
+            ICU::data
+            Boost::locale)
     endif ()
 endif()
 

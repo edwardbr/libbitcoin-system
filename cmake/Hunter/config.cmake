@@ -1,6 +1,4 @@
-hunter_config(Boost VERSION 1.70.0-p0 
-	CMAKE_ARGS
-		BUILD_SHARED_LIBS=ON)
+hunter_config(Boost VERSION 1.70.0-p0)
 
 hunter_config(secp256k1
     URL https://github.com/edwardbr/secp256k1/archive/master.tar.gz
